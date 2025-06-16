@@ -54,6 +54,16 @@ await eticket.sleep(1500)
 await eticket.navigate().back();
 console.log("↩️ Navigated back to previous page");
 await eticket.sleep(1500)
+
+//scroll to dropdown range
+const elementToScrollTo = await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/div/div/app-event-container[1]/section/div/div/img"));
+
+await eticket.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", elementToScrollTo);
+
+console.log("🖱️ Scrolled to the image element");
+
+
+await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/span/div/h2/span")).click()
 } catch (err) {
     console.log('❌ homepage test failed:', err.message);
   } finally {
