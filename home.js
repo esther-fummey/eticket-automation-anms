@@ -50,11 +50,30 @@ await eticket.wait(until.elementLocated(By.xpath("//div[@class='title' and norma
     } else {
       console.log("ℹ️ No 'no events this month' message found.");
     }
+    await eticket.sleep(2000)
 
-  
+    //view all buttons
 
-    
+  const viewAllEventBtn = await eticket.wait(
+  until.elementLocated(By.xpath("//div[@class='view-all-button']//div[@class='btn' and normalize-space(text())='View all event']")),
+  10000
+);
 
+ // Scroll to the viewAllEventBtn
+    await eticket.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", viewAllEventBtn);
+    await eticket.sleep(2000)
+
+await viewAllEventBtn.click();
+console.log("✅ 'View all event' button clicked successfully!");
+
+await eticket.executeScript("window.scrollTo(0, 0);");
+console.log("⬆️ Scrolled to the top of the page");
+
+
+await eticket.sleep(2000)
+
+await eticket.navigate().back()
+await eticket.sleep(2000)
     
 
 
@@ -62,6 +81,6 @@ await eticket.wait(until.elementLocated(By.xpath("//div[@class='title' and norma
 } catch (err) {
     console.log('❌ homepage test failed:', err.message);
   } finally {
-    // await driver.quit();
+    await eticket.quit();
   }
 })();
