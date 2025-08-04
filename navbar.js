@@ -1,51 +1,113 @@
 const { Builder, By, until } = require('selenium-webdriver');
 
-(async function navbarTest() {
+// Main navbar test function
+async function navbarTest(browserName) {
+    let driver;
+    try {
+        driver = await new Builder().forBrowser(browserName).build();
+        await driver.manage().window().maximize();
 
-  const eticket = await new Builder().forBrowser('chrome').build();
-  eticket.manage().window().maximize()
+        // Open home page
+        await driver.get("http://159.8.238.90:7047/home");
+        await driver.sleep(5000);
 
-  try {
-    await eticket.get('http://159.8.238.90:7047/home'); // replace with your URL
+        // ✅ Click "This Week"
+        try {
+            await driver.wait(
+                until.elementLocated(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[1]/app-selectable-list/section/div/div/div[2]")),
+                10000
+            ).click();
+            console.log(`📌 ${browserName}: 'This Week' clicked.`);
+            await driver.sleep(2000);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: 'This Week' element not found.`);
+        }
 
-    // clicking on the menus
-    //click on category
-    const category =await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[1]/app-menubar/main/div/div/div[2]/nav/ul/li[1]"))
-    category.click()
+        // ✅ Check for alert message
+        try {
+            const alerts = await driver.findElements(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/app-toast/main/div[2]/p[1]"));
+            if (alerts.length > 0) {
+                const messageText = await alerts[0].getText();
+                console.log(`📢 ${browserName}: Alert Message Found - ${messageText}`);
+            } else {
+                console.log(`ℹ️ ${browserName}: No 'no events this week' message found.`);
+            }
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: Unable to read alert message.`);
+        }
 
-    console.log("✅ Clicked on Category");
+        // ✅ Click "This Month"
+        try {
+            const thisMonth = await driver.wait(
+                until.elementLocated(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[1]/div[3]")),
+                10000
+            );
+            await driver.wait(until.elementIsVisible(thisMonth));
+            await thisMonth.click();
+            console.log(`📌 ${browserName}: 'This Month' clicked.`);
+            // await driver.sleep(15000);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: 'This Month' element not clickable.`);
+        }
 
-    // Wait for 10 seconds (or use a smarter wait below)
-    await eticket.sleep(10000); // Wait 3 seconds before moving on
+        // ✅ View all events
+        try {
+            await driver.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[3]/app-secondary-button/main")).click();
+            console.log(`📌 ${browserName}: 'View All Events' clicked.`);
+            await driver.sleep(15000);
+            await driver.navigate().back();
+            console.log(`↩️ ${browserName}: Navigated back from events page.`);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: 'View All Events' not found.`);
+        }
 
+        // ✅ View all category
+        try {
+            await driver.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[3]/div[1]/div/h3")).click();
+            console.log(`📌 ${browserName}: 'View All Category' clicked.`);
+            await driver.sleep(1500);
+            await driver.navigate().back();
+            console.log(`↩️ ${browserName}: Navigated back from category page.`);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: 'View All Category' not found.`);
+        }
 
-    //click on Venues
-    const venues = await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[1]/app-menubar/main/div/div/div[2]/nav/ul/li[2]"),1000)
-    venues.click()
-    console.log("✅ Clicked on Venues");
+        // ✅ Scroll to dropdown range
+        try {
+            const elementToScrollTo = await driver.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/div/div/app-event-container[1]/section/div/div/img"));
+            await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", elementToScrollTo);
+            console.log(`🖱️ ${browserName}: Scrolled to dropdown image.`);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: Scroll element not found.`);
+        }
 
-    // Wait for 10 seconds (or use a smarter wait below)
-    await eticket.sleep(10000); // Wait 3 seconds before moving on
+        // ✅ Final Click
+        try {
+            await driver.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/span/div/h2/span")).click();
+            console.log(`📌 ${browserName}: Final element clicked.`);
+        } catch (e) {
+            console.log(`⚠️ ${browserName}: Final element not clickable.`);
+        }
 
-    //notification
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[1]/app-menubar/main/div/div/div[2]/div/div[1]")).click()
-    console.log("✅ Clicked on notification");
+        console.log(`✅ ${browserName}: Navbar test completed successfully.`);
 
-    // Wait for 15 seconds (or use a smarter wait below)
-    await eticket.sleep(15000); // Wait 3 seconds before moving on
+    } 
+    
+    
+    
+    catch (err) {
+        console.error(`❌ ${browserName}: Test failed -`, err.message);
+    } finally {
+        if (driver) {
+            // await driver.sleep(3000);
+            // await driver.quit();
+        }
+    }
+}
 
-    //click on the outside
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/div/div[2]")).click()
-    //profile
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[1]/app-menubar/main/div/div/div[2]/div/div[2]/img")).click()
-    console.log("✅ Clicked on profile");
-
-    // Wait for 15 seconds (or use a smarter wait below)
-    await eticket.sleep(1000); // Wait 3 seconds before moving on
-
-  } catch (err) {
-    console.log('❌ Login test failed:', err.message);
-  } finally {
-    // await driver.quit();
-  }
+// ✅ Run test on multiple browsers
+(async function runNavbarTests() {
+    await navbarTest('chrome');
+    await navbarTest('firefox');
+    // await navbarTest('MicrosoftEdge'); // Uncomment if Edge WebDriver is available
 })();

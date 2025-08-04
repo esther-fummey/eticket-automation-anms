@@ -7,17 +7,25 @@ const { Builder, By, until } = require('selenium-webdriver');
 
   try {
     await eticket.get('http://159.8.238.90:7047/home'); // replace with your URL
+    await eticket.sleep(5000)
+
+    // Locate Top Picks In 
+    const toppicks = await eticket.findElement(By.xpath("(//div[@class='title'])[1]"));
+
+    // Scroll to Top Picks
+    await eticket.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", toppicks);
+
+    console.log("🖱️ Scrolled to the target element successfully!");
 
     //top picks
     //this week
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[1]/div[2]")).click()
+    await eticket.wait(until.elementLocated(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[1]/app-selectable-list/section/div/div/div[2]"))).click()
+    console.log("this week is clicked")
     await eticket.sleep(2000)
-
+ 
       // Try to find the alert/message on the page
     const alerts = await eticket.findElements(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/app-toast/main/div[2]/p[1]"));
 
-
-    
 
     if (alerts.length > 0) {
       const messageText = await alerts[0].getText();
@@ -25,45 +33,32 @@ const { Builder, By, until } = require('selenium-webdriver');
     } else {
       console.log("ℹ️ No 'no events this week' message found.");
     }
-    //this month
-   // Wait and click on "This Month"
-    const thisMonth = await eticket.wait(until.elementLocated(
-      By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[1]/div[3]")
-    ), 10000);
+     await eticket.sleep(2000)
 
-    await eticket.wait(until.elementIsVisible(thisMonth), 10000);
-    await eticket.wait(until.elementIsEnabled(thisMonth), 10000);
-    await thisMonth.click();
+// this month
+await eticket.wait(until.elementLocated(By.xpath("//div[@class='title' and normalize-space(text())='This Month']"))).click()
+    console.log("this month is clicked")
+    // await eticket.sleep(2000)
+ 
+      // Try to find the alert/message on the page
+    const alertsmonth = await eticket.findElements(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/app-toast/main/div[2]/p[1]"));
 
-    console.log("✅ Clicked on 'This Month'");
-    await eticket.sleep(15000)
-    
-    //click on View all Events
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[2]/div/div[3]/app-secondary-button/main")).click()
-    await eticket.sleep(15000)
 
-    // Navigate back
-await eticket.navigate().back();
-console.log("↩️ Navigated back to previous page");
-await eticket.sleep(1500)
-    //click on "View all category"
-    await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[3]/div[1]/div/h3")).click()
+    if (alertsmonth.length > 0) {
+      const messageText = await alertsmonth[0].getText();
+      console.log("📢 Alert Message Found: ", messageText);
+    } else {
+      console.log("ℹ️ No 'no events this month' message found.");
+    }
+
+  
 
     
-    // Navigate back
-await eticket.navigate().back();
-console.log("↩️ Navigated back to previous page");
-await eticket.sleep(1500)
 
-//scroll to dropdown range
-const elementToScrollTo = await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/div/div/app-event-container[1]/section/div/div/img"));
-
-await eticket.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", elementToScrollTo);
-
-console.log("🖱️ Scrolled to the image element");
+    
 
 
-await eticket.findElement(By.xpath("/html/body/app-root/app-home-layout/main/div[2]/div[1]/app-home/main/div/div[5]/div/span/div/h2/span")).click()
+
 } catch (err) {
     console.log('❌ homepage test failed:', err.message);
   } finally {
